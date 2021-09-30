@@ -11,10 +11,10 @@ app.use("/public", express.static(`${process.cwd()}/public`));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
     console.log(req.method, req.path);
     next();
-  })
+})
 
 /* Api to solve the third problem of freecodecamp (Back End Development and APIs Projects)*/
 /*
@@ -42,11 +42,11 @@ const getHigher = (arr) => {
 }
 
 let arrayLinks = [
-    { original_url: "https://freeCodeCamp.org", short_url : 1},
-    { original_url: "http://www.freecodecamp.com" , short_url: 2},
-    { original_url: "http://www.youtube.com" , short_url: 3},
-    { original_url: "http://www.hackerrank.com" , short_url: 4},
-    { original_url: "http://www.codepen.io" , short_url: 5},
+    { original_url: "https://freeCodeCamp.org", short_url: 1 },
+    { original_url: "http://www.freecodecamp.com", short_url: 2 },
+    { original_url: "http://www.youtube.com", short_url: 3 },
+    { original_url: "http://www.hackerrank.com", short_url: 4 },
+    { original_url: "http://www.codepen.io", short_url: 5 },
 ]
 
 
@@ -58,16 +58,19 @@ app.get("/", (req, res) => {
 app.get("/api/shorturl/:short_url", (req, res) => {
     let jsonUrl = arrayLinks.find(ele => ele.short_url == req.params.short_url)
     //res.json({ original_url: jsonUrl.original_url });
-    if(jsonUrl)
+    if (jsonUrl)
         res.redirect(jsonUrl.original_url);
     else
-        res.status(404).json({error: "No URL found"});
+        res.status(404).json({ error: "No URL found" });
 })
 
+
 app.post("/api/shorturl", async (req, res) => {
-    console.log(req.body.url, " - ", validUrl.isUri(req.body.url), " - ", req.body.url.replace(/https?:\/\//, ""))
+    console.log(req.body.url, " ------ body \n ", validUrl.isUri(req.body.url), " ------- validacion \n ", req.body.url.replace(/^\w+:\/\/?/, "").replace(/(\/\w*)*$/, ""), "---------- recorted")
     if (validUrl.isUri(req.body.url)) {
-        dns.lookup(req.body.url.replace(/https?:\/\//, ""), (err, address, family) => {
+      const httpRegex = /^(http|https)(:\/\/)/;
+      if (httpRegex.test(req.body.url)){
+        dns.lookup(req.body.url.replace(/^\w+:\/\/?/, "").replace(/(\/.*)*$/, ""), (err, address, family) => {
             try {
                 if (!address || address == "undefined") {
                     res.json({ error: "Invalid Hostname" })
@@ -89,10 +92,12 @@ app.post("/api/shorturl", async (req, res) => {
                 res.json({ error: "Error validating Hosting" })
             }
         })
+      }
+        else {
+        res.json({ error: "invalid url" });
     }
-    else {
-        res.json({ error: "Invalid URL" });
     }
+    
 })
 /* Api1 to solve the second problem of freecodecamp (Back End Development and APIs Projects)*/
 /*
