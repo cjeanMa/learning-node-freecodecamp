@@ -4,7 +4,7 @@ const dns = require("dns");
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-const port = 3000;
+const port = 5000;
 
 app.use("/public", express.static(`${process.cwd()}/public`));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -41,11 +41,11 @@ const getHigher = (arr) => {
 }
 
 let arrayLinks = [
-    { short_url: 1, original_url: "http://www.facebook.com" },
-    { short_url: 2, original_url: "http://www.freecodecamp.com" },
-    { short_url: 3, original_url: "http://www.youtube.com" },
-    { short_url: 4, original_url: "http://www.hackerrank.com" },
-    { short_url: 5, original_url: "http://www.codepen.io" },
+    { original_url: "http://www.facebook.com" , short_url: 1},
+    { original_url: "http://www.freecodecamp.com" , short_url: 2},
+    { original_url: "http://www.youtube.com" , short_url: 3},
+    { original_url: "http://www.hackerrank.com" , short_url: 4},
+    { original_url: "http://www.codepen.io" , short_url: 5},
 ]
 
 
@@ -57,7 +57,10 @@ app.get("/", (req, res) => {
 app.get("/api/shorturl/:short_url", (req, res) => {
     let jsonUrl = arrayLinks.find(ele => ele.short_url == req.params.short_url)
     //res.json({ original_url: jsonUrl.original_url });
-    res.redirect(jsonUrl.original_url);
+    if(jsonUrl)
+        res.redirect(jsonUrl.original_url);
+    else
+        res.status(404).json({error: "No URL found"});
 })
 
 app.post("/api/shorturl", async (req, res) => {
@@ -73,7 +76,7 @@ app.post("/api/shorturl", async (req, res) => {
                     if (jsonUrl)
                         res.json(jsonUrl);
                     else {
-                        arrayLinks.push({ short_url: getHigher(arrayLinks) + 1, original_url: req.body.url })
+                        arrayLinks.push({ original_url: req.body.url, short_url: getHigher(arrayLinks) + 1 })
                         let newUrl = arrayLinks.find(ele => ele.original_url == req.body.url);
                         res.json(newUrl)
                     }
