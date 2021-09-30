@@ -4,7 +4,7 @@ const dns = require("dns");
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 app.use("/public", express.static(`${process.cwd()}/public`));
 app.use(bodyParser.urlencoded({ extended: false }));
