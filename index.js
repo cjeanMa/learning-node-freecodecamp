@@ -1,5 +1,6 @@
 const { json } = require("express");
-const URL = require("url").URL;
+//const URL = require("url").URL;
+const validUrl = require("valid-url");
 const dns = require("dns");
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -64,8 +65,9 @@ app.get("/api/shorturl/:short_url", (req, res) => {
 })
 
 app.post("/api/shorturl", async (req, res) => {
-    if (stringIsAValidUrl(req.body.url)) {
-        dns.lookup(req.body.url.replace("http://", ""), (err, address, family) => {
+    console.log(req.body.url, " - ", validUrl.isUri(req.body.url), " - ", req.body.url.replace(/https?:\/\//, ""))
+    if (validUrl.isUri(req.body.url)) {
+        dns.lookup(req.body.url.replace(/https?:\/\//, ""), (err, address, family) => {
             try {
                 if (!address || address == "undefined") {
                     res.json({ error: "Invalid Hostname" })
